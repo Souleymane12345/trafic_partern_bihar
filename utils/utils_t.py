@@ -1,5 +1,12 @@
 import os
 import pickle
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import StandardScaler
+
+from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_squared_error
 
 class utils_tools:
 
@@ -20,3 +27,22 @@ class utils_tools:
             model = pickle.load(file)
         print(f"Done")
         return model
+    
+    
+    def model_pipeline (cat_features, num_features):
+        column_transformer = ColumnTransformer([
+            ('ohe', OneHotEncoder(handle_unknown="ignore"), cat_features),
+            ('scaling', StandardScaler(), num_features)]
+        )
+
+        pipeline = Pipeline(steps=[
+            ('ohe_and_scaling', column_transformer),
+            ('regression', Ridge())
+        ])
+        
+        return pipeline
+
+    
+    def predict (model, data):
+       y_pred = model.predict(data)
+       return y_pred
