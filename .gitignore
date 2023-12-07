@@ -9,7 +9,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 connection/data_folder/
-db/
+#db/
 models/
 .idea/
 build/
