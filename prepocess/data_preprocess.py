@@ -13,10 +13,10 @@ class step_0:
     def load_data(path, data_type):
         print(f"Reading train data from the database: {path}")
         con = sqlite3.connect(path)
-        data_type = pd.read_sql('SELECT * FROM train', con)
+        data_type = pd.read_sql(f'SELECT * FROM {data_type}', con)
         con.close()
-        X = data_type.drop(columns=['target'])
-        y = data_type['target']
+        X = data_type.drop(columns=[common.TARGET])
+        y = data_type[common.TARGET]
         return X, y
 
     def transform_target(y):
@@ -30,6 +30,7 @@ class step_adding_features:
 
     def step1_add_features(X):
         
+        X['pickup_date'] = X['pickup_datetime'].dt.date
         df_abnormal_dates = X.groupby('pickup_date').size()
         abnormal_dates = df_abnormal_dates[df_abnormal_dates < df_abnormal_dates.quantile(0.02)]
         res = X.copy()
@@ -94,23 +95,21 @@ class step_adding_features:
 
 # --------------Step 4------------- 
 
-    class step4_adding_features:
+    def step4_remove_outliers(X, y):
+                res = X.copy()
 
-        def step4_remove_outliers(X, y):
-            res = X.copy()
+                d = res['log_distance_haversine']
+                d_min = d.quantile(0.01)
+                d_max = d.quantile(0.995)
+                cond_distance = (d > d_min) & (d < d_max)
 
-            d = res['log_distance_haversine']
-            d_min = d.quantile(0.01)
-            d_max = d.quantile(0.995)
-            cond_distance = (d > d_min) & (d < d_max)
+                y_min = y.quantile(0.005)
+                y_max = y.quantile(0.995)
+                cond_time = (y > y_min) & (y < y_max)
 
-            y_min = y.quantile(0.005)
-            y_max = y.quantile(0.995)
-            cond_time = (y > y_min) & (y < y_max)
+                cond_non_outliers = cond_distance & cond_time
 
-            cond_non_outliers = cond_distance & cond_time
-
-            return X[cond_non_outliers], y[cond_non_outliers]
+                return X[cond_non_outliers], y[cond_non_outliers]
 
 
 # --------------Step 5------------- 
