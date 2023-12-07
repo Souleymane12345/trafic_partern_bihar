@@ -16,3 +16,4 @@ RANDOM_STATE = int(config.get("ML", "RANDOM_STATE"))
 
 DB_PATH = os.path.join(ROOT_DIR, os.path.normpath(DB_PATH))
 
+
