@@ -8,7 +8,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-db/
+db/trafic_db.db
 models/
 .idea/
 build/
